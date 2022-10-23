@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class Player_movement : MonoBehaviour
@@ -10,7 +11,9 @@ public class Player_movement : MonoBehaviour
     protected Rigidbody2D rb;
     public float jump;
     public bool isOnFloor;
-
+    public Animator animator;
+    private bool facingRight = true;
+    private bool isJumping = false;
 
     // Start is called before the first frame update
     protected void Start()
@@ -19,20 +22,37 @@ public class Player_movement : MonoBehaviour
     }
 
     // Update is called once per frame
-    protected void Update()
+    protected virtual void Update()
     {
-        Move = Input.GetAxis("Horizontal");
+        
 
-        rb.velocity = new Vector2(speed * Move, rb.velocity.y);
+        Move = Input.GetAxis("Horizontal")*speed;
 
+        rb.velocity = new Vector2(Move, rb.velocity.y);
+
+        if(Move < 0 && facingRight)
+        {
+            Flip();
+        }else if(Move > 0 && !facingRight)
+        {
+            Flip();
+        }
+
+        animator.SetFloat("PlayerSpeed", Mathf.Abs(Move));
         jumpFunction();
     }
 
-    protected void OnCollisionEnter2D(Collision2D other)
+
+    protected virtual void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Ground"))
         {
             isOnFloor  = true;
+            if (isJumping)
+            {
+                animator.SetBool("isJumping", false);
+                isJumping = false;
+            }
         }
 
     }
@@ -50,9 +70,21 @@ public class Player_movement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow) && isOnFloor)
         {
+            animator.SetBool("isJumping", true);
             rb.AddForce(new Vector2(rb.velocity.x, jump));
-            Debug.Log("jump pressed");
+            isJumping  = true;
+
 
         }
     }
+
+    private void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+
+    }
+
 }
