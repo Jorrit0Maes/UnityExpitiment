@@ -10,7 +10,7 @@ public class Player_movement : MonoBehaviour
     private float Move;
     protected Rigidbody2D rb;
     public float jump;
-    public bool isOnFloor;
+    public bool isOnFloor = true;
     public Animator animator;
     private bool facingRight = true;
     private bool isJumping = false;
@@ -48,6 +48,7 @@ public class Player_movement : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
         {
             isOnFloor  = true;
+            animator.SetBool("isOnGround", isOnFloor);
             if (isJumping)
             {
                 animator.SetBool("isJumping", false);
@@ -62,6 +63,7 @@ public class Player_movement : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
         {
             isOnFloor = false;
+            animator.SetBool("isOnGround", isOnFloor);
         }
 
     }
@@ -73,7 +75,6 @@ public class Player_movement : MonoBehaviour
             animator.SetBool("isJumping", true);
             rb.AddForce(new Vector2(rb.velocity.x, jump));
             isJumping  = true;
-            Debug.Log(isJumping);
 
         }
     }
